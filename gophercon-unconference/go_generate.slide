@@ -1,0 +1,89 @@
+Go Generate
+Tags: foo, bar, baz
+18 Feb 2016
+
+Arpit Mohan
+Sr Engineer, Exotel
+@mohanarpit
+me@arpitmohan.com
+
+* Why?
+
+* Why?
+- Reduce the boring tasks
+- Get a computer to generate computer programs
+- Standardize code across the team
+
+* What?
+- Build time command, but separate from *go build*
+- Meant for the author and not the client
+- Ability to generate code by simply adding comments
+  //go:generate go tool yacc -o gopher.go -p parser gopher.y
+- All generated code must be checked in
+# This means that users should not run 'go generate' after they run 'go get'
+- Go read:
+.link https://blog.golang.org/generate
+
+* Basic Examples
+- Stringer function
+.code string_example.go
+
+* Basic Examples
+.code pill_string.go
+
+* Getters & Setters
+
+* Getters & Setters
+Generate standard functions for a given struct
+.code buildergenerator/example_struct.go /type Dial/,
+
+* Getters & Setters (contd)
+Create a struct to store the information
+.code buildergenerator/generator/buildergenerator.go /type Struct/,/^}/
+.code buildergenerator/generator/buildergenerator.go /type Field/,/^}/
+
+* Getters & Setters (contd)
+Parse the struct to extract the information
+.code buildergenerator/generator/buildergenerator.go /func getStructInfo/,/^}/
+
+* Getters & Setters (contd)
+Get the fields & their types from the AST
+.code buildergenerator/generator/buildergenerator.go /func structFields/,/^}/
+
+* Getters & Setters (contd)
+Let's define the template. For separation, you can put it in a different file
+.code buildergenerator/generator/buildergenerator.go /func getTemplate/,/^}/
+
+- *Note*: The FuncMap helps us define some helper functions
+
+* Getters & Setters (contd)
+The Template!
+.code buildergenerator/getter_setter.tpl
+
+* Getters & Setters (contd)
+Generate & format the code
+.code buildergenerator/generator/buildergenerator.go /func generateCode/,/^}/
+- The go/format package ensures that your code looks good. Tools FTW!
+
+* Getters & Setters (contd)
+Add the appropriate comment to the struct
+.code buildergenerator/example_struct.go
+
+* Putting it all together. Demo Time!
+
+* Test the generated code
+.play buildergenerator/example/example0.go
+
+* Test the generated code
+.play buildergenerator/example/example1.go
+
+* Idiosyncrasies
+- Leave a line after the generate comment
+- Don't leave a space at the beginning of the line
+.code -edit buildergenerator/example_struct.go
+
+* Other interesting use-cases
+- Generate model code from SQL files:
+.link https://github.com/knq/xo
+
+- Generate code from interface files (Protobuf, Thrift)
