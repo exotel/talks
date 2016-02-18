@@ -1,11 +1,11 @@
 Go Generate
-Tags: foo, bar, baz
+Tags: Golang, Exotel, Generate
 18 Feb 2016
 
 Arpit Mohan
 Sr Engineer, Exotel
 @mohanarpit
-me@arpitmohan.com
+arpit@exotel.in
 
 * Why?
 
@@ -13,6 +13,7 @@ me@arpitmohan.com
 - Reduce the boring tasks
 - Get a computer to generate computer programs
 - Standardize code across the team
+- Be a man. Do the right thing! (Courtesy: Russel Peters)
 
 * What?
 - Build time command, but separate from *go build*
@@ -85,5 +86,55 @@ Add the appropriate comment to the struct
 * Other interesting use-cases
 - Generate model code from SQL files:
 .link https://github.com/knq/xo
-
+- Generate functions from SQL queries
+.link http://willowtreeapps.com/blog/go-generate-your-database-code/
 - Generate code from interface files (Protobuf, Thrift)
+
+* Other interesting use-cases (contd)
+For this SQL query
+.code test.sql
+
+A generate command can be
+
+  //go:generate codegen -type interface
+
+To Output
+
+  type SQLQuery interface {
+      UserByID(db *sql.DB, user *User, id int64) error
+  }
+
+* Other interesting use-cases (contd)
+
+Plus, you can also generate the implementation
+
+  //go:generate codegen -type interface
+
+To Output
+
+  func (db *DBReader) UserByID(db *sql.DB, user *User, id int64) error {
+    row := db.QueryRow("SELECT id, name FROM accounts WHERE id = $1", id)
+    return row.Scan(&account.ID, &account.Name)
+  }
+
+* Other interesting use-cases (contd)
+
+Like a good developer, let's create test harnesses
+
+  //go:generate codegen -type mock
+
+To Output
+
+  func (db *MockDBReader) UserByID(db *sql.DB, user *User, id int64) error {
+      user = &User{
+          ID: 1,
+          Name: “Test”,
+      }
+  }
+  return nil
+
+* Wrap Up
+
+- All this goodness by just inserting a minimal lines of code.
+
+- _If_ _the_ _code_ _looks_ _boilerplate_ _,_ _then_ _spend_ _your_ _time_ _and_ _energy_ _in_ _generating_ _it_ _and_ _not_ _writing_ _it_
