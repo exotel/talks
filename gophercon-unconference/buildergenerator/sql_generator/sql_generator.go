@@ -1,6 +1,6 @@
 // +build OMIT
 
-package main1
+package main
 
 import (
 	"bufio"

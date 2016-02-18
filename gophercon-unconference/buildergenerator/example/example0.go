@@ -5,7 +5,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/mohanarpit/gophercon/buildergenerator"
+	"github.com/exotel/go-talks/gophercon-unconference/buildergenerator"
 )
 
 func main() {

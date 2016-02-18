@@ -32,6 +32,9 @@ arpit@exotel.in
 * Basic Examples
 .code pill_string.go
 
+* Basic Examples
+.play stringer/main.go
+
 * Getters & Setters
 
 * Getters & Setters
