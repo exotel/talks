@@ -16,9 +16,9 @@ arpit@exotel.in
 - Be a man. Do the right thing! (Courtesy: Russel Peters)
 
 * What?
-- Build time command, but separate from *go build*
+- Build time command, but separate from ' *go* *build* '
 - Meant for the author and not the client
-- Ability to generate code by simply adding comments
+- Ability to generate code by simply adding comments to source code
   //go:generate go tool yacc -o gopher.go -p parser gopher.y
 - All generated code must be checked in
 # This means that users should not run 'go generate' after they run 'go get'
@@ -132,6 +132,9 @@ To Output
       }
   }
   return nil
+
+#* Other interesting use-cases (contd)
+#.code sql_generator.go /func main/,
 
 * Wrap Up
 
