@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/exotel/go-talks/gophercon-unconference"
+	"github.com/exotel/talks/gophercon-unconference"
 )
 
 func main() {
