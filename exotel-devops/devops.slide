@@ -1,0 +1,126 @@
+Devops on Steroids
+Tags: Terraform, Ansible, Jenkins, Exotel, Devops
+16 Mar 2016
+
+Arpit Mohan
+Sr Engineer, Exotel
+@mohanarpit
+arpit@exotel.in
+
+* Why?
+
+* Why?
+- Reduce the boring tasks
+- Make setups & deployments repeatable. Remove human error
+- Make it dead-simple for anyone to deploy. Noobs too!
+
+* Moving Parts
+- Infrastructure (AWS)
+- Configuration (Configure a new server to bring it to a good state)
+- Building assets
+- Deployment (Deploy code + assets)
+- Monitoring
+
+* Tools
+
+* Tools we used
+.link https://terraform.io Terraform (For infrastructure setup)
+.link https://www.ansible.com/ Ansible (For configuration)
+.link https://jenkins-ci.org/ Jenkins (For building assets)
+.link https://github.com/adammck/terraform-inventory Terraform-Inventory (For deploying)
+.link https://prometheus.io/ Prometheus (For monitoring)
+
+* Basic Workflow
+- Run the Terraform config files by first planning & then executing
+- Build your binaries & assets using Jenkins
+- Upload the assets to S3
+- Use Terraform-Ansible to configure the server
+- Use Terraform-Ansible to deploy the assets on the relevant servers
+
+
+* Basic Terraform Configuration
+.code base.tf /START OMIT/,/END OMIT/
+
+* Basic Terraform Configuration
+- For each resource configuration, refer to
+.link https://www.terraform.io/docs/providers/aws/
+
+* Terraform Practices
+- Each server type must be in a new file. Terraform picks up all *.tf files from the folder.
+- All related resources (DNS, DB) for that instance must be in that file.
+- Move common configurations such as Security Groups, Routing etc to a common file.
+- For clusters, always setup an ELB resource and assign a DNS record to it. Suggested naming convention: <env>.<service>.internal.<domain>
+- For each server add a SRV record for service discovery. Used for monitoring.
+- Always commit the terraform.tfstate & terraform.tfstate.backup files. This stores the output of the previous run.
+
+* Terraform Examples
+Create the instance
+.code api.tf /INSTANCE START OMIT/,/INSTANCE STOP OMIT/
+
+* Terraform Examples
+Create the ELB
+.code api.tf /ELB START OMIT/,/ELB STOP OMIT/
+
+* Terraform Examples
+Create the DNS Record
+.code api.tf /DNS START OMIT/,/DNS STOP OMIT/
+
+* Terraform Examples
+Create the SRV Record
+.code api.tf /SRV START OMIT/,/SRV STOP OMIT/
+
+* Configure Servers
+
+* Terraform-Ansible
+- Ansible is capable of picking up servers dynamically. Terraform-Ansible leverages that by parsing the terraform.tfstate to find the actual servers
+- Remember to always run it from the Terraform directory. Only then does it work
+
+  $ ../aws-assume-role.sh ansible-playbook -i /home/arpit/projects/go/bin/terraform-inventory
+  ansible/api.yml
+
+Note: The aws-assume-role is only required while running from local. Not from Jenkins
+
+* Ansible Configuration Example
+.code api-ansible.yml
+
+PS: Note the directory structure shown in the terminal
+
+* Ansible Configuration Example
+.code api-ansible-tasks.yml /START1 OMIT/,/STOP1 OMIT/
+
+* Ansible Configuration Example (contd)
+.code api-ansible-tasks.yml /START2 OMIT/,/STOP2 OMIT/
+
+* Ansible Practices
+- Keep the main yml file as clean as possible.
+- Create a role for each service. Each role in-turn has tasks & files.
+- Try to re-use code as much as possible.
+
+* Build Assets
+
+* Jenkins
+- Setup a server for the express purpose of building code. Jenkins only acts as a coordinator.
+- Setup jobs on Jenkins to pull code from the repo, SCP to Compile Server & run build scripts over SSH
+
+* Short Jenkins Demo
+
+* Monitoring
+
+* Prometheus
+- A host of monitoring solutions out there. We chose Prometheus.
+- It's a pull based system rather than push based. Akin to Nagios.
+- Easy to integrate into our applications because it was written in Go.
+- Can alert along with capability to write smarter rules.
+- Grafana can dashboard it easily.
+
+* Prometheus Configuration Example
+.code prometheus-rules.yml /START1 OMIT/,/STOP1 OMIT/
+This configuration monitors itself
+
+* Prometheus Configuration Example
+.code prometheus-rules.yml /START2 OMIT/,/STOP2 OMIT/
+
+* Prometheus Alert Example
+.code prometheus-alert.yml
+
+* Short Prometheus Demo

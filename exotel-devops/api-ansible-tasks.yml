@@ -1,0 +1,43 @@
+---
+
+// START1 OMIT
+- name: Copy the init script
+  copy: src=api.init dest=/etc/init.d/api mode=0755
+  sudo: yes
+
+- name: Create the init command
+  command: update-rc.d api defaults
+  sudo: yes
+
+- name: Kill any existing API process
+  service: name=api state=stopped
+  sudo: yes
+
+- name: Install mysql-client
+  apt: name=mysql-client state=latest
+  sudo: yes
+
+- name: Create the exotel_deployment directory
+  file: path=/home/ubuntu/api state=directory owner=ubuntu group=ubuntu
+
+// STOP1 OMIT
+// START2 OMIT
+- name: Remove binaries if it exists locally. Ansible has issues copying over binaries if they exist locally
+  file: path=/home/ubuntu/api/api state=absent
+
+- name: Get the binaries from s3
+  s3: bucket=build.bucket object=api/{{ item.src }}
+      dest=/home/ubuntu/api/{{ item.dest }}
+      mode=get
+      region=ap-southeast-1
+  with_items:
+    - { src: "config.json.prod", dest: "config.json" }
+    - { src: "api", dest: "api" }
+
+- name: Make the binary executable
+  file: path=/home/ubuntu/api/api mode=755
+
+- name: Start the service
+  service: name=api state=restarted
+  sudo: yes
+// STOP2 OMIT

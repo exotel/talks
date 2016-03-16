@@ -1,0 +1,11 @@
+---
+
+- name: Configure the API server
+  hosts: api
+  remote_user: ubuntu
+  gather_facts: no
+
+  roles:
+    - base
+    - api
+    - heka
